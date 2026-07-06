@@ -1,0 +1,12 @@
+# 원본 데이터 (4.9GB — GitHub 용량 제한 초과, LMS에서 다운로드)
+rtu_data_full.csv
+
+# 전처리 산출물 (스크립트로 재생성 가능)
+processed/
+eda_output/extracts/
+
+# OS/편집기
+.DS_Store
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
