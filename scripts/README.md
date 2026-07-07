@@ -35,6 +35,41 @@ python 02_eda.py <데이터폴더>
 - macOS: `"AppleGothic"`
 - Linux: `"Noto Sans CJK JP"` 또는 `"NanumGothic"` (없으면 `sudo apt install fonts-nanum`)
 
+## 데이터 컬럼 설명
+
+### 원본 (rtu_data_full.csv)
+
+3상 전력(R·S·T상) 계측이라 전압·전류·역률이 상별로 3개씩 존재.
+
+| 컬럼 | 의미 | 이 데이터에서의 값 |
+|---|---|---|
+| `module(equipment)` | 계측기 번호(설비명). 예: `13(3호기)` | 13개 설비 |
+| `timestamp` | 측정 시각 (Unix 밀리초) | 5초 간격 |
+| `localtime` | 측정 시각 (YYYYMMDDHHMMSS) | timestamp와 동일 |
+| `operation` | 설비 가동 여부 (1=가동) | 전 구간 1 → 정보량 없음 |
+| `voltageR/S/T` | 상전압 (V) | 210~220V, 3호기만 190까지 하락 |
+| `voltageRS/ST/TR` | 선간전압 (V, 상전압×√3) | ~365~377V |
+| `currentR/S/T` | 상전류 (A) | 5~30A |
+| `activePower` | 유효전력 (W) — 실제 일하는 전력, 요금의 기본 | 평균 ~3,010W |
+| `powerFactorR/S/T` | 역률 (%) — 공급 전력 중 실제 일에 쓰인 비율 | 85~100, 예비건조기·6호기는 60·70까지 붕괴 |
+| `reactivePowerLagging` | 지상 무효전력 (Var) — 모터 코일 등이 소비하는 "일 안 하는" 전력 | ~90~1,550 |
+| `accumActiveEnergy` | 누적 전력량 (Wh) — 계량기처럼 계속 증가, 차분하면 기간 사용량 | 설비당 ~10.8MWh/5개월 |
+
+비유: 유효전력=맥주, 무효전력=거품, 역률=잔에서 맥주 비율. 거품이 많으면 같은 일에 더 굵은 전선·큰 변압기가 필요하고, 한전은 역률 90% 미만 시 페널티 요금 부과 → 역률 붕괴를 비효율로 정의한 근거.
+
+### 집계 (processed/agg_1min.parquet, agg_1h.parquet, agg_1h.csv)
+
+| 컬럼 | 의미 |
+|---|---|
+| `module`, `ts` | 설비명, 집계 구간 시작 시각 |
+| `activePower_mean/max/min` | 구간 내 유효전력 평균/최대/최소 (W) |
+| `powerFactor_mean` | 3상 평균 역률의 구간 평균 (%) |
+| `reactivePower_mean` | 무효전력 평균 (Var) |
+| `currentSum_mean` | 3상 전류 합의 평균 (A, 1분 집계만) |
+| `operation_ratio` | 구간 내 가동 비율 (0~1) |
+| `accumEnergy_last` | 구간 마지막 누적 전력량 (Wh) |
+| `n_samples` | 집계에 쓰인 원본 행 수 (1분=12, 1시간=720이면 결측 없음) |
+
 ## 파일 설명
 
 | 파일 | 역할 |
