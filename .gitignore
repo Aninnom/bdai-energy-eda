@@ -4,6 +4,8 @@ rtu_data_full.csv
 # 전처리 산출물 (스크립트로 재생성 가능)
 processed/
 eda_output/extracts/
+features/
+model_output/scores_*.parquet
 
 # OS/편집기
 .DS_Store
